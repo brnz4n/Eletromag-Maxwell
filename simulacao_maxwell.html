@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulação: Onda Eletromagnética (Lei de Maxwell)</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f0f2f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; }
+        .controls { text-align: center; margin-bottom: 20px; padding: 10px; background: #eee; border-radius: 5px;}
+        p { text-align: center; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Visualização das Leis de Maxwell: Onda Eletromagnética</h1>
+    <p>
+        Representação da interação dinâmica: <br>
+        <span style="color:red; font-weight:bold;">Vermelho: Campo Elétrico (E)</span> | 
+        <span style="color:blue; font-weight:bold;">Azul: Campo Magnético (B)</span>
+    </p>
+    
+    <div class="controls">
+        <label>Frequência (Velocidade da Oscilação):</label>
+        <input type="range" id="freqSlider" min="1" max="10" value="5">
+    </div>
+
+    <div id="grafico" style="width:100%;height:600px;"></div>
+    
+    <p style="font-size: 0.9em;">
+        Nota: Observe que quando E é máximo, B também é máximo (em fase no vácuo), <br>
+        e eles são sempre perpendiculares à direção de propagação (Eixo Z).
+    </p>
+</div>
+
+<script>
+    // Configuração Inicial
+    let t = 0;
+    const z = []; 
+    const steps = 100;
+    const length = 20;
+    
+    // Criando o eixo Z (Direção de propagação)
+    for (let i = 0; i < steps; i++) {
+        z.push((i / steps) * length);
+    }
+
+    function getData(frequency) {
+        let Ey = []; // Campo Elétrico no eixo Y
+        let Bx = []; // Campo Magnético no eixo X
+        let zeros = []; // Para preencher os eixos que não usamos
+
+        // k = número de onda, w = frequência angular
+        let k = 1; 
+        let w = frequency * 0.1;
+
+        for (let i = 0; i < steps; i++) {
+            // Equação da onda: A * sin(kz - wt)
+            let val = Math.sin(k * z[i] - w * t);
+            
+            Ey.push(val);
+            Bx.push(val); 
+            zeros.push(0);
+        }
+
+        // Traço do Campo Elétrico (Vermelho - Plano YZ)
+        var traceE = {
+            type: 'scatter3d',
+            mode: 'lines',
+            x: zeros,
+            y: Ey,
+            z: z,
+            opacity: 1,
+            line: { width: 6, color: 'red', reversescale: false },
+            name: 'Campo Elétrico (E)'
+        };
+
+        // Traço do Campo Magnético (Azul - Plano XZ)
+        var traceB = {
+            type: 'scatter3d',
+            mode: 'lines',
+            x: Bx,
+            y: zeros,
+            z: z,
+            opacity: 1,
+            line: { width: 6, color: 'blue', reversescale: false },
+            name: 'Campo Magnético (B)'
+        };
+
+        // Vetor de Propagação (Linha preta central)
+        var traceK = {
+            type: 'scatter3d',
+            mode: 'lines',
+            x: zeros,
+            y: zeros,
+            z: z,
+            opacity: 0.5,
+            line: { width: 2, color: 'black' },
+            name: 'Direção (k)'
+        };
+
+        return [traceE, traceB, traceK];
+    }
+
+    // Layout do Gráfico
+    var layout = {
+        scene: {
+            xaxis: {title: 'B (Magnético)', range: [-1.5, 1.5]},
+            yaxis: {title: 'E (Elétrico)', range: [-1.5, 1.5]},
+            zaxis: {title: 'Propagação (z)', range: [0, 20]},
+            camera: {
+                eye: {x: 1.5, y: 1.5, z: 0.5}
+            }
+        },
+        margin: {l: 0, r: 0, b: 0, t: 0}
+    };
+
+    // Plotagem Inicial
+    Plotly.newPlot('grafico', getData(5), layout);
+
+    // Loop de Animação
+    function animate() {
+        t += 1;
+        let freq = document.getElementById('freqSlider').value;
+        
+        Plotly.react('grafico', getData(freq), layout);
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+</script>
+
+</body>
+</html>
