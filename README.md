@@ -3,7 +3,7 @@
 Este projeto apresenta uma **simulação visual e interativa de uma onda eletromagnética**, baseada nas **Leis de Maxwell**, com foco na propagação dos campos elétrico (E) e magnético (B) no vácuo.
 
 A aplicação utiliza **HTML, CSS e JavaScript**, juntamente com a biblioteca **Plotly.js**, para criar uma visualização **3D dinâmica** que facilita a compreensão física do fenômeno.
-
+![Tela](imagens/image.png)
 ---
 
 ## 📌 Objetivo do Projeto
